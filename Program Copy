@@ -1,0 +1,1069 @@
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.JPanel;
+import javax.xml.ws.Dispatch;
+
+class Tester {
+
+	public static void main(String[] args) {
+		Container container = new Container();
+	}
+
+}
+
+
+class Equation {
+	private int M;
+	private String k, reac1, reac2, pro1, pro2, phases, ion;
+	private int MIon;
+	private boolean color;
+	private RectDraw rectangle;
+	private int whichReaction;
+	//reaction 1
+	public Equation(int M, String k, boolean color, String reac1, String reac2, String pro1, String pro2, String phases, String ion, int MIon){
+		this.M= M;
+		this.k = k;
+		this.color = color;
+		this.reac1 = reac1;
+		this.reac2 = reac2;
+		this.pro1 = pro1;
+		this.pro2 = pro2;
+		this.phases = phases;
+		this.ion = ion;
+		this.MIon = MIon;
+		makeRect();
+		rectangle.inputWhich(1);
+	}
+	
+	public Equation(int M, String k, boolean color, String reac1, String reac2, String pro1, String phases){
+		//reaction 3
+		if(phases.lastIndexOf("s")>0){
+			this.M= M;
+			this.k = k;
+			this.color = color;
+			this.reac1 = reac1;
+			this.reac2 = reac2;
+			this.pro1 = pro1;
+			pro2 = null;
+			this.phases = phases;
+			ion = null;
+			MIon = -1;
+			makeRect();
+			rectangle.inputWhich(3);
+		}//reaction 2
+		else{
+			this.M= M;
+			this.k = k;
+			this.color = color;
+			this.reac1 = reac1;
+			this.reac2 = null;
+			this.pro1 = reac2;
+			this.pro2 = pro1;
+			this.phases = phases;
+			ion = null;
+			MIon = -1;
+			makeRect();
+			rectangle.inputWhich(2);
+		}
+	}
+	
+	//reaction 4
+	public Equation(int M, String k, boolean color, String reac1, String pro1, String pro2, String phases, String ion, int MIon){
+		this.M= M;
+		this.k = k;
+		this.color = color;
+		this.reac1 = reac1;
+		reac2 = null;
+		this.pro1 = pro1;
+		this.pro2 = pro2;
+		this.phases = phases;
+		this.ion = ion;
+		this.MIon = MIon;
+		makeRect();
+		rectangle.inputWhich(4);
+	} 
+	
+	public void makeRect(){
+		rectangle = new RectDraw();
+		rectangle.setOpaque(true);
+		rectangle.setBounds(0, 0, 1500, 1000);
+		rectangle.setBackground(Color.white);
+	}
+	
+	public void draw(Equation eq){//draws everything
+		
+	}
+	
+	public JLabel drawEq1(Equation eq){//draws equation
+		String equation = new String();
+		equation = eq.getReac1() + eq.getPhases().substring(0, 3) + " + " + eq.getReac2() + eq.getPhases().substring(3, 7) + " <===> " + eq.getPro1() + eq.getPhases().substring(7, 11) + " + " + eq.getPro2() + eq.getPhases().substring(11, 14);
+		JLabel label = new JLabel(equation);
+		label.setFont(label.getFont().deriveFont(36.0f));
+		label.setBounds(400, 25, 800, 50);
+		return label;
+	}
+	
+	public JLabel drawEq2(Equation eq){
+		String equation = new String();
+		equation = eq.getReac1() + eq.getPhases().substring(0, 3) + " <===> " + eq.getPro1() + eq.getPhases().substring(3, 6) + " + " + eq.getPro2() + eq.getPhases().substring(6, 9);
+		JLabel label = new JLabel(equation);
+		label.setFont(label.getFont().deriveFont(36.0f));
+		label.setBounds(400, 25, 800, 50);
+		return label;
+	}
+	
+	public JLabel drawEq3(Equation eq){
+		String equation = new String();
+		equation = eq.getReac1() + eq.getPhases().substring(0, 3) + " +  " + eq.getReac2() + eq.getPhases().substring(3, 6) + "<===> " + eq.getPro1() + eq.getPhases().substring(6, 9);
+		JLabel label = new JLabel(equation);
+		label.setFont(label.getFont().deriveFont(36.0f));
+		label.setBounds(400, 25, 800, 50);
+		return label;
+	}
+	
+	public JLabel drawEq4(Equation eq){
+		String equation = new String();
+		equation = eq.getReac1() + eq.getPhases().substring(0, 3) + " <===> " + eq.getPro1() + eq.getPhases().substring(3, 7) + " + " + eq.getPro2() + eq.getPhases().substring(7, 11);
+		JLabel label = new JLabel(equation);
+		label.setFont(label.getFont().deriveFont(36.0f));
+		label.setBounds(400, 25, 800, 50);
+		return label;
+	}
+	
+	public String reduceM(boolean solidEq){//M = Ratio of Reactants to Products
+		System.out.println("M is reduced");
+		if(solidEq){
+			return (new String("Solid has no effect"));
+		}
+		if(M > 0){
+			M -= 5;
+			System.out.println(M);
+			rectangle.changeWidth(false);
+			return (new String("Shift Right"));
+		}
+		else
+			System.out.println("M cannot be reduced more");
+			return (new String("<html>Out of reactants,<br>so you cannot<br>shift right<html>"));
+	}
+	
+	public String increaseM(boolean solidEq){//M = Ratio of Reactants to Products
+		System.out.println("M is increased");
+		if(solidEq){
+			return (new String("Solid has no effect"));
+		}
+		if(M < 100){
+			M += 5;
+			System.out.println(M);
+			rectangle.changeWidth(true);
+			return (new String("Shift Left"));
+		}
+		else{
+			System.out.println("M cannot be increased more");
+		return (new String("<html>Out of products,<br>so you cannot<br>shift left<html>"));
+		} 
+	}
+		
+	public String changeVol(boolean vol){//changes the volume, true = increase
+		boolean temp = true;
+		if(vol && (ion == null)){
+			temp = false;
+			return reduceM(false);
+		}
+		if(!vol && (ion == null)){
+			temp = false;
+			return increaseM(false);
+		}
+		if(temp)
+			System.out.println("There are no Gases in the container, so changing the volume or pressure has no effect.");
+		return "No effect";
+	}
+	
+	public String changePress(boolean P){//changes the pressure, true = increase
+		return changeVol(!P);
+	}
+	
+	public String addIon(){
+		if(ion != null){
+			MIon++;
+			return reduceM(false);
+		}else{
+			System.out.println("Adding an ion has no effect on the equation");
+			return "No effect";
+		}
+	}
+	
+	public String subtractIon(){
+		if(ion != null && MIon > 0){
+			MIon--;
+			return increaseM(false);
+		}else{
+			System.out.println("Subtracting an ion has no effect on the equation");
+			return "No effect";
+		}
+	}
+	
+	public String solidEqincrease(){
+		if(rectangle.getwhichReaction() == 1){
+			return "Solid has no effect";
+		}else
+			return "";
+	}
+	
+	public String solidEqdecrease(){
+		if(rectangle.getwhichReaction() == 1){
+		return "Solid has no effect";
+		}else
+			return "";
+	}
+	
+	public RectDraw getRect(){
+		return rectangle;
+	}
+	
+	public int getM(){
+		return M;
+	}
+	
+	public String getK(){
+		return k;
+	}
+	
+	public boolean getColor(){
+		return color;
+	}
+	
+	public String getReac1(){
+		return reac1;
+	}
+	
+	public String getReac2(){
+		return reac2;
+	}
+	
+	public String getPro1(){
+		return pro1;
+	}
+	
+	public String getPro2(){
+		return pro2;
+	}
+	
+	public String getPhases(){
+		return phases;
+	}
+	
+	public String getIon(){
+		return ion;
+	}
+	
+	public int getMIon(){
+		return MIon;
+	}
+	public int getwhichReaction(){
+		   whichReaction = rectangle.getwhichReaction();
+		   return whichReaction;
+	   }
+}
+
+
+class Container implements ActionListener{
+
+	private JButton button1, button2, button3, button4, add, add2, add3, add4, add5, add6, add7, subtract, subtract2, subtract3, subtract4, subtract5, subtract6, subtract7, back;
+	/*button1 = 1st rxn button; button2 = 2nd rxn button; button3 = 3rd rxn button; button4 = 4th rxn button;
+	 * add = Volume add button; add2 = Pressure add button; add3 = 1st Reactant add button; add4 = 2nd Reactant add button; add5 = 1st Product add button; add6 = 2nd Product add button; add7 = add more ion button;
+	 * subtract = Volume subtract button; subtract2 = Pressure subtract button; subtract3 = 1st Reactant subtract button; subtract4 = 2nd Reactant subtract button; subtract5 = 1st Product subtract button; subtract6 = 2nd Product subtract button; subtract7 = subtract ion button;
+	 * back = back button; ionB = add Ion button;
+	*/
+	private JFrame frame;
+	private Equation equation;
+	private JPanel contentPane;
+	private JLabel label, label1, label2, label3, label4, vol, pressure, ionL, shift;
+	/*label = Title label (Le Chatelier's Principle:); label1 = 1st rxn label(Solids and Ions); 
+	 * label2 = 2nd rxn label(Gases); label3 = 3rd rxn label(Gases and Solids); 
+	 * label4 = 4h rxn label(Solid and Aqueous); vol = Volme label; pressure = Pressure label; 
+	 * ionL = Ion label; shift = shift label (Shift left/Shift right/out of reactants or products);
+	*/
+	private String eq1, eq2, eq3, eq4;
+	private RectDraw rectangle = null;
+	public Container(){
+		
+		 frame = new JFrame("Le Châtelier's Principle Simulator");
+	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+	        contentPane = new JPanel();
+	        contentPane.setOpaque(true);
+	        contentPane.setBackground(Color.WHITE);
+	        contentPane.setLayout(null);
+	        label = new JLabel("Le Châtelier's Principle:", JLabel.LEFT);
+	        label.setSize(300, 30);
+	        label.setLocation(50, 40);
+	        label.setFont (label.getFont ().deriveFont (24.0f));
+
+	        //First reaction
+	        label1 = new JLabel("Solids and Ions");
+	        label1.setSize(300, 30);
+	        label1.setLocation(400, 325);
+	        label1.setFont (label1.getFont().deriveFont(18.0f));
+	        
+	        eq1 = new String("Cu + (2)Ag(+) <===> Cu(+)2 + (2)Ag");
+	        button1 = new JButton(eq1);
+	        button1.setSize(350, 30);
+	        button1.setLocation(400, 375);
+	        button1.addActionListener(this);
+	        button1.setFont (button1.getFont().deriveFont(18.0f));
+
+	        //Second Reaction
+	        label2 = new JLabel("Gases");
+	        label2.setSize(300, 30);
+	        label2.setLocation(400, 225);
+	        label2.setFont (label2.getFont().deriveFont(18.0f));
+	        
+	        eq2 = new String("(2)NH3 <===> N2 + (3)H2");
+	        button2 = new JButton(eq2);
+	        button2.setSize(350, 30);
+	        button2.setLocation(400, 275);
+	        button2.addActionListener(this);
+	        button2.setFont (button2.getFont().deriveFont(18.0f));
+	        
+	        //Third Reaction
+	        label3 = new JLabel("Gases and Solids");
+	        label3.setSize(300, 30);
+	        label3.setLocation(400, 125);
+	        label3.setFont (label3.getFont().deriveFont(18.0f));
+	        
+	        eq3 = new String("H2 + I2 <===> (2)HI");
+	        button3 = new JButton(eq3);
+	        button3.setSize(350, 30);
+	        button3.setLocation(400, 175);
+	        button3.addActionListener(this);
+	        button3.setFont (button3.getFont ().deriveFont (18.0f));
+	        
+	        //Fourth Reaction
+	        label4 = new JLabel("Solid and Aqueous");
+	        label4.setSize(300, 30);
+	        label4.setLocation(400, 25);
+	        label4.setFont (label4.getFont ().deriveFont (18.0f));
+	        
+	        eq4 = new String("AgCl <===> Ag+ + Cl-");
+	        button4 = new JButton(eq4);
+	        button4.setSize(350, 30);
+	        button4.setLocation(400, 75);
+	        button4.addActionListener(this);
+	        button4.setFont (button4.getFont ().deriveFont (18.0f));
+	        
+	        
+	        contentPane.add(label);
+	        contentPane.add(button1);
+	        contentPane.add(label1);
+	        contentPane.add(button2);
+	        contentPane.add(label2);
+	        contentPane.add(button3);
+	        contentPane.add(label3);
+	        contentPane.add(button4);
+	        contentPane.add(label4);
+	        
+	        frame.setContentPane(contentPane);
+	        makeFrameFullSize(frame);
+	        frame.setVisible(true);
+	        
+	        
+	        add = new JButton("+");
+	        add.addActionListener(this);
+	        add2 = new JButton("+");
+	        add2.addActionListener(this);
+	        add3 = new JButton("+");
+	        add3.addActionListener(this);
+	        add4 = new JButton("+");
+	        add4.addActionListener(this);
+	        add5 = new JButton("+");
+	        add5.addActionListener(this);
+	        add6 = new JButton("+");
+	        add6.addActionListener(this);
+	        
+	        subtract= new JButton("-");
+	        subtract.addActionListener(this);
+	        subtract2= new JButton("-");
+	        subtract2.addActionListener(this);
+	        subtract3= new JButton("-");
+	        subtract3.addActionListener(this);
+	        subtract4= new JButton("-");
+	        subtract4.addActionListener(this);
+	        subtract5= new JButton("-");
+	        subtract5.addActionListener(this);
+	        subtract6= new JButton("-");
+	        subtract6.addActionListener(this);	        
+	        
+	        add7 = new JButton("+");
+	        add7.addActionListener(this);
+	        subtract7 = new JButton("-");
+	        subtract7.addActionListener(this);
+	        subtract7.setBackground(Color.WHITE);
+	        subtract7.setBounds(55, 300, 50, 50);
+	        subtract7.setFont (subtract7.getFont().deriveFont(24.0f));
+	        add7.setBackground(Color.WHITE);
+	        add7.setBounds(5, 300, 50, 50);
+	        add7.setFont (add7.getFont().deriveFont(18.0f));
+	        
+	        ionL = new JLabel("Ion");
+	        ionL.setBounds(120, 300, 150, 60);
+	        ionL.setBackground(Color.WHITE);
+	        ionL.setFont(ionL.getFont().deriveFont(18.0f));
+	        
+	        back = new JButton("Back");
+	        back.addActionListener(this);
+	        back.setBackground(Color.LIGHT_GRAY);
+	        back.setBounds(10, 640, 150, 50);
+	        back.setFont (back.getFont().deriveFont(30.0f));
+	        vol = new JLabel("Volume");
+	        pressure = new JLabel("Pressure");
+	        
+	        shift = new JLabel("");
+	        shift.setBounds(1000, 80, 750, 250);
+	        shift.setBackground(Color.WHITE);
+	        shift.setFont (shift.getFont().deriveFont(36.0f));
+	        
+	       /* canvas = new Canvas();
+	        canvas.setSize(400, 400);*/
+	        
+	}
+
+	public void makeFrameFullSize(JFrame aFrame){
+	  Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	  aFrame.setSize(screenSize.width, screenSize.height);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource()  == button4){
+			System.out.println("4th reaction");
+			equation = new Equation(50, "", false, "AgCl", "Ag+", "Cl-", "(s)(aq)(aq)", "F-", 0);
+			reaction4(equation);
+			
+		}
+		if(e.getSource()  == button3){
+			System.out.println("3rd reaction");
+			equation = new Equation(50, "", true, "H2", "I2", "2HI", "(g)(s)(g)");
+			reaction3(equation);
+			//canvas.drawReaction3();
+		}
+		
+		if(e.getSource()  == button2){
+			System.out.println("2nd reaction");
+			equation = new Equation(50, "", false, "2NH3", "N2", "3H2", "(g)(g)(g)");
+			reaction2(equation);
+			//canvas.drawReaction2();
+		}
+		
+		if(e.getSource()  == button1){
+			System.out.println("1st reaction");
+			equation = new Equation(50, "", false, "Cu", "2Ag+", "Cu+2", "2Ag", "(s)(aq)(aq)(s)", "O(-2)", 1);
+			reaction1(equation);
+			//canvas.drawReaction1();
+		}
+		if(e.getSource() == add){
+			System.out.println("add");
+			shift.setText(equation.changeVol(true));
+		}
+		if(e.getSource() == add2){
+			System.out.println("add2");
+			shift.setText(equation.changePress(true));
+		}
+		if(e.getSource() == add3){
+			System.out.println("add3");
+			if(equation.getwhichReaction() == 1 || equation.getwhichReaction() == 4){
+			shift.setText(equation.reduceM(true));
+			}else
+				shift.setText(equation.reduceM(false));
+			//shift.setText(equation.solidEqincrease());
+		}
+		if(e.getSource() == add4){
+			System.out.println("add4");
+			if(equation.getwhichReaction() == 3){
+				shift.setText(equation.reduceM(true));
+				}else
+					shift.setText(equation.reduceM(false));
+		}
+		if(e.getSource() == add5){
+			System.out.println("add5");
+			shift.setText(equation.increaseM(false));
+		}
+		if(e.getSource() == add6){
+			System.out.println("add6");
+			if(equation.getwhichReaction() == 1){
+				shift.setText(equation.increaseM(true));
+				}else
+					shift.setText(equation.increaseM(false));
+		}
+		if(e.getSource() == subtract){
+			System.out.println("subtract");
+			shift.setText(equation.changeVol(false));
+		}
+		if(e.getSource() == subtract2){
+			System.out.println("subtract2");
+			shift.setText(equation.changePress(false));
+		}
+		if(e.getSource() == subtract3){
+			System.out.println("subtract3");
+			if(equation.getwhichReaction() == 1 || equation.getwhichReaction() == 4){
+				shift.setText(equation.increaseM(true));
+				}else
+					shift.setText(equation.increaseM(false));
+			//shift.setText(equation.solidEqdecrease());
+		}
+		if(e.getSource() == subtract4){
+			System.out.println("subtract4");
+			if(equation.getwhichReaction() == 3){
+				shift.setText(equation.increaseM(true));
+				}else
+					shift.setText(equation.increaseM(false));
+		}
+		if(e.getSource() == subtract5){
+			System.out.println("subtract5");
+			shift.setText(equation.reduceM(false));
+		}
+		if(e.getSource() == subtract6){
+			System.out.println("subtract6");
+			if(equation.getwhichReaction() == 1){
+				shift.setText(equation.reduceM(true));
+				}else
+					shift.setText(equation.reduceM(false));
+		}
+		if(e.getSource() == back){
+			System.out.println("clicked back");
+			back();
+		}
+		if(e.getSource() == add7){
+			System.out.println("add ion");
+			shift.setText(equation.addIon());
+		}
+		if(e.getSource() == subtract7){
+			System.out.println("subract ion");
+			shift.setText(equation.subtractIon());
+		}
+		
+		if(!(rectangle == null)){
+			rectangle.repaint();
+		}
+		contentPane.repaint();
+	}
+	
+	public void reaction1(Equation e){
+		
+		add.setBackground(Color.WHITE);
+		add.setBounds(5, 100, 40, 40);
+		add.setSize(50, 50);
+		add.setFont (add.getFont ().deriveFont (18.0f));
+		add2.setBackground(Color.WHITE);
+		add2.setBounds(5, 200, 40, 40);
+		add2.setSize(50, 50);
+		add2.setFont (add2.getFont ().deriveFont (18.0f));
+		add3.setBackground(Color.WHITE);
+		add3.setBounds(400, 80, 40, 40);
+		add3.setSize(50, 50);
+		add3.setFont (add.getFont ().deriveFont (18.0f));
+		add4.setBackground(Color.WHITE);
+		add4.setBounds(550, 80, 40, 40);
+		add4.setSize(50, 50);
+		add4.setFont (add2.getFont ().deriveFont (18.0f));
+		add5.setBackground(Color.WHITE);
+		add5.setBounds(840, 80, 40, 40);
+		add5.setSize(50, 50);
+		add5.setFont (add.getFont ().deriveFont (18.0f));
+		add6.setBackground(Color.WHITE);
+		add6.setBounds(1010, 80, 40, 40);
+		add6.setSize(50, 50);
+		add6.setFont (add2.getFont ().deriveFont (18.0f));
+		
+		subtract.setBackground(Color.WHITE);
+		subtract.setBounds(50, 100, 40, 40);
+		subtract.setSize(50, 50);
+		subtract.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract2.setBackground(Color.WHITE);
+		subtract2.setBounds(50, 200, 40, 40);
+		subtract2.setSize(50, 50);
+		subtract2.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract3.setBackground(Color.WHITE);
+		subtract3.setBounds(450, 80, 40, 40);
+		subtract3.setSize(50, 50);
+		subtract3.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract4.setBackground(Color.WHITE);
+		subtract4.setBounds(600, 80, 40, 40);
+		subtract4.setSize(50, 50);
+		subtract4.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract5.setBackground(Color.WHITE);
+		subtract5.setBounds(890, 80, 40, 40);
+		subtract5.setSize(50, 50);
+		subtract5.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract6.setBackground(Color.WHITE);
+		subtract6.setBounds(1060, 80, 40, 40);
+		subtract6.setSize(50, 50);
+		subtract6.setFont(subtract2.getFont ().deriveFont (24.0f));
+		
+		vol.setBounds(110, 100, 100, 60);
+		pressure.setBounds(110, 200, 100, 60);
+		vol.setFont (vol.getFont ().deriveFont (18.0f));
+		pressure.setFont (pressure.getFont ().deriveFont (18.0f));
+		
+		//creates RectDraw (container) and sets it equal to the other
+		//RectDraw in Equation Class
+		RectDraw rectangle = equation.getRect();
+				
+		contentPane.removeAll();
+		contentPane.add(vol);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(pressure);
+		contentPane.add(add2);
+		contentPane.add(subtract2);
+		contentPane.add(label);
+		contentPane.add(equation.drawEq1(equation));
+		contentPane.add(add3);
+		contentPane.add(add4);
+		contentPane.add(add5);
+		contentPane.add(add6);
+		contentPane.add(subtract3);
+		contentPane.add(subtract4);
+		contentPane.add(subtract5);
+		contentPane.add(subtract6);
+		//contentPane.add(add7);
+		//contentPane.add(subtract7);
+		//contentPane.add(ionL);
+		contentPane.add(back);
+		contentPane.add(shift);
+		frame.add(rectangle);
+		frame.setContentPane(contentPane);
+		contentPane.repaint();
+		rectangle.repaint();
+	}
+	public void reaction2(Equation e){
+		
+		add.setBackground(Color.WHITE);
+		add.setBounds(5, 100, 40, 40);
+		add.setSize(50, 50);
+		add.setFont (add.getFont ().deriveFont (18.0f));
+		add2.setBackground(Color.WHITE);
+		add2.setBounds(5, 200, 40, 40);
+		add2.setSize(50, 50);
+		add2.setFont (add2.getFont ().deriveFont (18.0f));
+		add3.setBackground(Color.WHITE);
+		add3.setBounds(400, 80, 40, 40);
+		add3.setSize(50, 50);
+		add3.setFont (add.getFont ().deriveFont (18.0f));
+		add5.setBackground(Color.WHITE);
+		add5.setBounds(655, 80, 40, 40);
+		add5.setSize(50, 50);
+		add5.setFont (add2.getFont ().deriveFont (18.0f));
+		add6.setBackground(Color.WHITE);
+		add6.setBounds(795, 80, 40, 40);
+		add6.setSize(50, 50);
+		add6.setFont (add.getFont ().deriveFont (18.0f));
+		
+		subtract.setBackground(Color.WHITE);
+		subtract.setBounds(50, 100, 40, 40);
+		subtract.setSize(50, 50);
+		subtract.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract2.setBackground(Color.WHITE);
+		subtract2.setBounds(50, 200, 40, 40);
+		subtract2.setSize(50, 50);
+		subtract2.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract3.setBackground(Color.WHITE);
+		subtract3.setBounds(450, 80, 40, 40);
+		subtract3.setSize(50, 50);
+		subtract3.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract5.setBackground(Color.WHITE);
+		subtract5.setBounds(705, 80, 40, 40);
+		subtract5.setSize(50, 50);
+		subtract5.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract6.setBackground(Color.WHITE);
+		subtract6.setBounds(845, 80, 40, 40);
+		subtract6.setSize(50, 50);
+		subtract6.setFont (subtract.getFont ().deriveFont (24.0f));
+		
+		vol.setBounds(110, 100, 100, 60);
+		pressure.setBounds(110, 200, 100, 60);
+		vol.setFont (vol.getFont ().deriveFont (18.0f));
+		pressure.setFont (pressure.getFont ().deriveFont (18.0f));
+		
+		//creates RectDraw (container) and sets it equal to the other
+		//RectDraw in Equation Class
+		RectDraw rectangle = equation.getRect();
+		
+		contentPane.removeAll();
+		contentPane.add(vol);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(pressure);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(add2);
+		contentPane.add(subtract2);
+		contentPane.add(label);
+		contentPane.add(equation.drawEq2(equation));
+		contentPane.add(add3);
+		contentPane.add(add5);
+		contentPane.add(add6);
+		contentPane.add(subtract3);
+		contentPane.add(subtract5);
+		contentPane.add(subtract6);
+		contentPane.add(add7);
+		contentPane.add(subtract7);
+		contentPane.add(ionL);
+		contentPane.add(back);
+		contentPane.add(shift);
+		frame.add(rectangle);
+		frame.setContentPane(contentPane);
+		contentPane.repaint();
+		rectangle.repaint();
+	}
+	
+	public void reaction3(Equation e){
+		
+		add.setBackground(Color.WHITE);
+		add.setBounds(5, 100, 40, 40);
+		add.setSize(50, 50);
+		add.setFont (add.getFont ().deriveFont (18.0f));
+		add2.setBackground(Color.WHITE);
+		add2.setBounds(5, 200, 40, 40);
+		add2.setSize(50, 50);
+		add2.setFont (add2.getFont ().deriveFont (18.0f));
+		add3.setBackground(Color.WHITE);
+		add3.setBounds(390, 80, 40, 40);
+		add3.setSize(50, 50);
+		add3.setFont (add.getFont ().deriveFont (18.0f));
+		add4.setBackground(Color.WHITE);
+		add4.setBounds(530, 80, 40, 40);
+		add4.setSize(50, 50);
+		add4.setFont(add2.getFont ().deriveFont(18.0f));
+		add6.setBackground(Color.WHITE);
+		add6.setBounds(730, 80, 40, 40);
+		add6.setSize(50, 50);
+		add6.setFont (add.getFont ().deriveFont (18.0f));
+		
+		subtract.setBackground(Color.WHITE);
+		subtract.setBounds(50, 100, 40, 40);
+		subtract.setSize(50, 50);
+		subtract.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract2.setBackground(Color.WHITE);
+		subtract2.setBounds(50, 200, 40, 40);
+		subtract2.setSize(50, 50);
+		subtract2.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract3.setBackground(Color.WHITE);
+		subtract3.setBounds(440, 80, 40, 40);
+		subtract3.setSize(50, 50);
+		subtract3.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract4.setBackground(Color.WHITE);
+		subtract4.setBounds(580, 80, 40, 40);
+		subtract4.setSize(50, 50);
+		subtract4.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract6.setBackground(Color.WHITE);
+		subtract6.setBounds(780, 80, 40, 40);
+		subtract6.setSize(50, 50);
+		subtract6.setFont (subtract.getFont ().deriveFont (24.0f));
+		
+		vol.setBounds(110, 100, 100, 60);
+		pressure.setBounds(110, 200, 100, 60);
+		vol.setFont (vol.getFont ().deriveFont (18.0f));
+		pressure.setFont (pressure.getFont ().deriveFont (18.0f));
+		
+		//creates RectDraw (container) and sets it equal to the other
+		//RectDraw in Equation Class
+		RectDraw rectangle = equation.getRect();
+		
+		contentPane.removeAll();
+		contentPane .add(vol);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(pressure);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(add2);
+		contentPane.add(subtract2);
+		contentPane.add(label);
+		contentPane.add(equation.drawEq3(equation));
+		contentPane.add(add3);
+		contentPane.add(add4);
+		contentPane.add(add6);
+		contentPane.add(subtract3);
+		contentPane.add(subtract4);
+		contentPane.add(subtract6);
+		contentPane.add(add7);
+		contentPane.add(subtract7);
+		contentPane.add(ionL);
+		contentPane.add(back);
+		contentPane.add(shift);
+		frame.add(rectangle);
+		frame.setContentPane(contentPane);
+		contentPane.repaint();
+		rectangle.repaint();
+	}
+	
+	public void reaction4(Equation e){
+		
+		add.setBackground(Color.WHITE);
+		add.setBounds(5, 100, 40, 40);
+		add.setSize(50, 50);
+		add.setFont (add.getFont ().deriveFont (18.0f));
+		add2.setBackground(Color.WHITE);
+		add2.setBounds(5, 200, 40, 40);
+		add2.setSize(50, 50);
+		add2.setFont (add2.getFont ().deriveFont (18.0f));
+		add3.setBackground(Color.WHITE);
+		add3.setBounds(400, 80, 40, 40);
+		add3.setSize(50, 50);
+		add3.setFont (add.getFont ().deriveFont (18.0f));
+		add5.setBackground(Color.WHITE);
+		add5.setBounds(660, 80, 40, 40);
+		add5.setSize(50, 50);
+		add5.setFont (add.getFont ().deriveFont (18.0f));
+		add6.setBackground(Color.WHITE);
+		add6.setBounds(830, 80, 40, 40);
+		add6.setSize(50, 50);
+		add6.setFont (add2.getFont ().deriveFont (18.0f));
+		
+		subtract.setBackground(Color.WHITE);
+		subtract.setBounds(50, 100, 40, 40);
+		subtract.setSize(50, 50);
+		subtract.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract2.setBackground(Color.WHITE);
+		subtract2.setBounds(50, 200, 40, 40);
+		subtract2.setSize(50, 50);
+		subtract2.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract3.setBackground(Color.WHITE);
+		subtract3.setBounds(450, 80, 40, 40);
+		subtract3.setSize(50, 50);
+		subtract3.setFont (subtract.getFont ().deriveFont (24.0f));
+		subtract5.setBackground(Color.WHITE);
+		subtract5.setBounds(710, 80, 40, 40);
+		subtract5.setSize(50, 50);
+		subtract5.setFont (subtract2.getFont ().deriveFont (24.0f));
+		subtract6.setBackground(Color.WHITE);
+		subtract6.setBounds(880, 80, 40, 40);
+		subtract6.setSize(50, 50);
+		subtract6.setFont (subtract.getFont ().deriveFont (24.0f));
+		
+		vol.setBounds(110, 100, 100, 60);
+		pressure.setBounds(110, 200, 100, 60);
+		vol.setFont (vol.getFont ().deriveFont (18.0f));
+		pressure.setFont (pressure.getFont ().deriveFont (18.0f));
+		
+		//creates RectDraw (container) and sets it equal to the other
+		//RectDraw in Equation Class
+		RectDraw rectangle = equation.getRect();
+		
+		contentPane.removeAll();
+		contentPane .add(vol);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(pressure);
+		contentPane.add(add);
+		contentPane.add(subtract);
+		contentPane.add(add2);
+		contentPane.add(subtract2);
+		contentPane.add(label);
+		contentPane.add(equation.drawEq4(equation));
+		contentPane.add(add3);
+		contentPane.add(add5);
+		contentPane.add(add6);
+		contentPane.add(subtract3);
+		contentPane.add(subtract5);
+		contentPane.add(subtract6);
+		contentPane.add(add7);
+		contentPane.add(subtract7);
+		contentPane.add(ionL);
+		contentPane.add(back);
+		contentPane.add(shift);
+		frame.add(rectangle);
+		frame.setContentPane(contentPane);
+		contentPane.repaint();
+		rectangle.repaint();
+	}
+	
+	public void back(){
+		shift.setText("");
+		contentPane.removeAll();
+		contentPane.add(label);
+        contentPane.add(button1);
+        contentPane.add(label1);
+        contentPane.add(button2);
+        contentPane.add(label2);
+        contentPane.add(button3);
+        contentPane.add(label3);
+        contentPane.add(button4);
+        contentPane.add(label4);
+        contentPane.repaint();
+	}
+	
+	public JPanel getPanel(){
+		return contentPane;
+	}
+	
+	public JFrame getFrame(){
+		return frame;
+	}
+	
+	/*public void setPanel(){
+		contentPane = canvas1.getCanvas();
+	}*/
+	
+}
+
+
+
+
+
+
+class RectDraw extends JPanel{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private int whichReaction; //tells which reaction is chosen
+	private int width = 40;
+	private boolean rOrP; //boolean that returns if reactant or product, true = reactant, false = product
+	private Color purple;
+	
+	protected void paintComponent(Graphics g) {	  
+		Color lightBlue = new Color(215, 215, 255);
+		g.setColor(lightBlue);
+	      super.paintComponent(g);
+	      g.fillRect(500, 410, 320, 210);
+	      g.setColor(Color.BLACK);
+	      g.drawRect(500, 200, 320, 420);
+	      if(whichReaction == 1){
+	    	//Create the solids
+	    	  g.setColor(Color.blue);
+	    	  g.fillRect(510, 420, width, 190);
+	    	  g.fillRect(500, 5, 60, 20);
+	    	  g.setColor(Color.red);
+	    	  g.fillRect(734, 420, 80 - width, 190);
+	    	  g.fillRect(970, 5, 60, 20);
+	    	  //Creates the ions
+	    	  for(int i = (width/4); i > 0; i--){//red ovals 1st row
+	    		  if(i <= 10){
+	    			  g.setColor(Color.blue);
+	    			  g.fillOval(620, 410 + (10 * i), 10, 10);
+	    		  }else{
+	    			  g.setColor(Color.blue);
+	    			  g.fillOval(640, 310 + (10 * i), 10, 10);
+	    		  }
+	    	  }
+	    	  for(int w = 20 - (width/4); w > 0; w--){//blue ovals 1st row
+	    		  if(w <= 10){
+	    			  g.setColor(Color.red);
+	    		  	  g.fillOval(680, 410 + (10 * w), 10, 10);
+	    		  }
+	    		  else{
+	    			  g.setColor(Color.red);
+	    			  g.fillOval(700, 310 + (10 * w), 10, 10);
+	    		  }
+	    	  }
+	      }
+	      if(whichReaction == 2){
+	    	  g.setColor(Color.green);
+	    	  g.fillRect(430, 5, 60, 20);
+	    	  g.setColor(Color.blue);
+	    	  g.fillRect(820, 5, 60, 20);
+	    	  g.setColor(Color.red);
+	    	  g.fillRect(675, 5, 60, 20);
+	    	if(rOrP || !rOrP){
+	    	int temp = (width/4);
+	    	  	for(int x = 509; x <= 800; x += 32){
+	    	  		for(int y = 216; y <= 372; y += 104){
+	    	  			if(temp > 0){
+	    	  				g.setColor(Color.green);
+	    	  				g.fillOval(x, y, 20, 20);
+	    	  				g.fillOval(x, y + 52, 20, 20);
+	    	  			}else{
+	    	  				g.setColor(Color.blue);
+	    					g.fillOval(x, y, 7, 7);
+	    					g.fillOval(x, y + 10, 7, 7);
+	    					g.fillOval(x + 10, y, 7, 7);
+	    					g.fillOval(x, y + 52, 7, 7);
+	    					g.setColor(Color.red);
+	    					g.fillOval(x + 10, y + 10, 4, 4);
+	    					//g.fillOval(x, y + 52, 7, 7);
+	    					g.setColor(Color.blue);
+	    					g.fillOval(x, y + 62, 7, 7);
+	    					g.fillOval(x + 10, y + 52, 7, 7);
+	    					g.setColor(Color.red);
+	    					g.fillOval(x + 10, y + 62, 4, 4);
+	    	  			}
+	    	  			temp--;
+	    	  		}
+	    	  	}
+	    	  }
+	      }
+	      if(whichReaction == 3){
+	    	  purple = new Color(230 - (width * 2), 0, 230 - (width * 2));
+				g.setColor(purple);
+				super.paintComponent(g);
+			      g.fillRect(500, 410, 320, 210);
+			      g.setColor(Color.BLACK);
+			      g.drawRect(500, 200, 320, 420);
+	      }
+	      if(whichReaction == 4){
+	    	//Create the solid
+	    	  g.setColor(Color.red);
+	    	  g.fillRect(734, 420, width, 190);
+	    	  g.fillRect(425, 5, 60, 20);
+	    	  //Creates the ions
+	    	  for(int w = 20 - (width/4); w > 0; w--){//blue ovals 1st column
+	    		  if(w <= 10){
+	    		  g.setColor(Color.blue);
+	    		  g.fillOval(680, 410 + (10 * w), 10, 10);
+	    		  }else{
+	    			  g.setColor(Color.blue);
+	    			  g.fillOval(640, 310 + (10 * w), 10, 10);
+	    			  }
+	    	  }
+	    	  for(int w = 20 - (width/4); w > 0; w--){//blue ovals 2nd column
+	    		  if(w <= 10){
+	    			  g.setColor(Color.green.darker());
+	    			  g.fillOval(700, 410 + (10 * w), 10, 10);
+		    		  }else{
+		    			  g.setColor(Color.green.darker());
+		    			  g.fillOval(660, 310 + (10 * w), 10, 10);
+		    			  }  
+	    	  }
+	      }
+	   }
+	   
+	   public void inputWhich(int s){//use this to input which reaction to draw in the container (whether to draw 
+			whichReaction = s;
+		}
+	   
+	   
+	   //boolean parameter tells if increase (true) and decrease (false)
+	   public void changeWidth(boolean change){
+		   if(change && (width < 80)){
+			   width += 4;
+			   rOrP = false;
+		   }
+		   else{
+			   rOrP = true;
+			   if(width > 0){
+				   width -= 4;
+			   }
+		   }
+		   
+	   }
+	   
+	   public int getwhichReaction(){
+		   return whichReaction;
+	   }
+	   
+}
