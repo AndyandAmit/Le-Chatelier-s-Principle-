@@ -418,7 +418,7 @@ class Container implements ActionListener{
 	        add7.setBounds(5, 300, 50, 50);
 	        add7.setFont (add7.getFont().deriveFont(18.0f));
 	        
-	        ionL = new JLabel("Ion");
+	        ionL = new JLabel("(F-) Ion");
 	        ionL.setBounds(120, 300, 150, 60);
 	        ionL.setBackground(Color.WHITE);
 	        ionL.setFont(ionL.getFont().deriveFont(18.0f));
