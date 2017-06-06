@@ -340,7 +340,7 @@ class Container implements ActionListener{
 	        button2.setFont (button2.getFont().deriveFont(18.0f));
 	        
 	        //Third Reaction
-	        label3 = new JLabel("Gases and Solids");
+	        label3 = new JLabel("Gases and Solids (Color)");
 	        label3.setSize(300, 30);
 	        label3.setLocation(400, 125);
 	        label3.setFont (label3.getFont().deriveFont(18.0f));
@@ -1011,6 +1011,7 @@ class RectDraw extends JPanel{
 	    	  purple = new Color(230 - (width * 2), 0, 230 - (width * 2));
 				g.setColor(purple);
 				super.paintComponent(g);
+				g.fillRect(550, 5, 60, 20);
 			      g.fillRect(500, 410, 320, 210);
 			      g.setColor(Color.BLACK);
 			      g.drawRect(500, 200, 320, 420);
